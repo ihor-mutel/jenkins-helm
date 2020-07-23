@@ -1,0 +1,141 @@
+# helm install my-release ./ -n jenkins -f values-override.yaml
+# helm install my-release stable/jenkins -n jenkins -f values-override.yaml
+# printf $(kubectl get secret --namespace jenkins my-release-jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo
+
+master:
+
+  enableXmlConfig: true
+
+  additionalPlugins:
+    - maven-plugin:2.7.1
+    - job-dsl:1.77
+    - github-branch-source:2.8.3
+
+
+  # export POD_NAME=$(kubectl get pods --namespace jenkins -l "app.kubernetes.io/component=jenkins-master" -l "app.kubernetes.io/instance=my-release" -o jsonpath="{.items[0].metadata.name}")
+
+  # kubectl -n jenkins delete secrets jenkins-secrets jenkins-credentials
+
+  # kubectl -n jenkins cp $POD_NAME:/var/jenkins_home/secrets/master.key master.key
+  # kubectl -n jenkins cp $POD_NAME:/var/jenkins_home/secrets/hudson.util.Secret hudson.util.Secret
+  # kubectl -n jenkins cp $POD_NAME:/var/jenkins_home/credentials.xml credentials.xml
+
+  # kubectl create secret generic jenkins-credentials --from-file=credentials.xml -n jenkins
+  # kubectl create secret generic jenkins-secrets --from-file=hudson.util.Secret --from-file=master.key -n jenkins
+  # kubectl create secret generic migor --from-file=config.json -n jenkins
+
+  secretsFilesSecret: jenkins-secrets
+
+  credentialsXmlSecret: jenkins-credentials
+
+  jobs:
+    test-job: |-
+      <?xml version='1.0' encoding='UTF-8'?>
+      <project>
+        <keepDependencies>false</keepDependencies>
+        <properties/>
+        <scm class="hudson.scm.NullSCM"/>
+        <canRoam>false</canRoam>
+        <disabled>false</disabled>
+        <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+        <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+        <triggers/>
+        <concurrentBuild>false</concurrentBuild>
+        <builders/>
+        <publishers/>
+        <buildWrappers/>
+      </project>
+    test-job-2: |-
+      <?xml version='1.0' encoding='UTF-8'?>
+      <project>
+        <keepDependencies>false</keepDependencies>
+        <properties/>
+        <scm class="hudson.scm.NullSCM"/>
+        <canRoam>false</canRoam>
+        <disabled>false</disabled>
+        <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+        <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+        <triggers/>
+        <concurrentBuild>false</concurrentBuild>
+        <builders/>
+        <publishers/>
+        <buildWrappers/>
+    org: |-
+        <?xml version='1.1' encoding='UTF-8'?>
+        <jenkins.branch.OrganizationFolder plugin="branch-api@2.5.8">
+          <actions/>
+          <description></description>
+          <properties>
+            <jenkins.branch.OrganizationChildHealthMetricsProperty>
+              <templates>
+                <com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric plugin="cloudbees-folder@6.14">
+                  <nonRecursive>false</nonRecursive>
+                </com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric>
+              </templates>
+            </jenkins.branch.OrganizationChildHealthMetricsProperty>
+            <jenkins.branch.OrganizationChildOrphanedItemsProperty>
+              <strategy class="jenkins.branch.OrganizationChildOrphanedItemsProperty$Inherit"/>
+            </jenkins.branch.OrganizationChildOrphanedItemsProperty>
+            <jenkins.branch.OrganizationChildTriggersProperty>
+              <templates>
+                <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger plugin="cloudbees-folder@6.14">
+                  <spec>H H/4 * * *</spec>
+                  <interval>86400000</interval>
+                </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+              </templates>
+            </jenkins.branch.OrganizationChildTriggersProperty>
+            <jenkins.branch.NoTriggerOrganizationFolderProperty>
+              <branches>.*</branches>
+            </jenkins.branch.NoTriggerOrganizationFolderProperty>
+          </properties>
+          <folderViews class="jenkins.branch.OrganizationFolderViewHolder">
+            <owner reference="../.."/>
+          </folderViews>
+          <healthMetrics>
+            <com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric plugin="cloudbees-folder@6.14">
+              <nonRecursive>false</nonRecursive>
+            </com.cloudbees.hudson.plugins.folder.health.WorstChildHealthMetric>
+          </healthMetrics>
+          <icon class="jenkins.branch.MetadataActionFolderIcon">
+            <owner class="jenkins.branch.OrganizationFolder" reference="../.."/>
+          </icon>
+          <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.14">
+            <pruneDeadBranches>true</pruneDeadBranches>
+            <daysToKeep>-1</daysToKeep>
+            <numToKeep>-1</numToKeep>
+          </orphanedItemStrategy>
+          <triggers>
+            <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger plugin="cloudbees-folder@6.14">
+              <spec>H H/4 * * *</spec>
+              <interval>86400000</interval>
+            </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
+          </triggers>
+          <disabled>false</disabled>
+          <navigators>
+            <org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator plugin="github-branch-source@2.8.3">
+              <repoOwner>web1991t</repoOwner>
+              <credentialsId>web1991t</credentialsId>
+              <traits>
+                <org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                </org.jenkinsci.plugins.github__branch__source.BranchDiscoveryTrait>
+                <org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                </org.jenkinsci.plugins.github__branch__source.OriginPullRequestDiscoveryTrait>
+                <org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+                  <strategyId>1</strategyId>
+                  <trust class="org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$TrustPermission"/>
+                </org.jenkinsci.plugins.github__branch__source.ForkPullRequestDiscoveryTrait>
+              </traits>
+            </org.jenkinsci.plugins.github__branch__source.GitHubSCMNavigator>
+          </navigators>
+          <projectFactories>
+            <org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectFactory plugin="workflow-multibranch@2.21">
+              <scriptPath>Jenkinsfile</scriptPath>
+            </org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectFactory>
+          </projectFactories>
+          <buildStrategies/>
+        </jenkins.branch.OrganizationFolder>
+
+
+  overwriteJobs: true
