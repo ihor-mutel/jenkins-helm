@@ -1,35 +1,41 @@
-String dockerfile = """
-FROM gradle:6.3.0-jre8
+pipeline {
 
-RUN echo test > test.txt
-
-CMD ["/bin/sh"]
+    triggers {
+        cron('H */4 * * 1-5')
+    }
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+spec:
+  containers:
+  - name: maven
+    image: maven:alpine
+    command:
+    - cat
+    tty: true
+  - name: busybox
+    image: busybox
+    command:
+    - cat
+    tty: true
 """
-
-podTemplate(containers: [
-        containerTemplate(name: 'kaniko', image: 'registry.gitlab.com/griffinplus/gitlab-kaniko:latest', ttyEnabled: true, command: 'cat')
-],
-        volumes: [
-                secretVolume(secretName: 'docker-registry-kaniko', mountPath: '/kaniko/.docker')
-        ]
-) {
-
-    node(POD_LABEL) {
-
-        stage('Build docker') {
-            
-            checkout scm
-            
-            container('kaniko') {
-
-                stage('Build docker') {
-
-                    writeFile file: 'Dockerfile', text: dockerfile
-
-                    sh /* BUILD AND PUSH IMAGE */ '/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=migor/test:latest'
+        }
+    }
+    stages {
+        stage('Run maven') {
+            steps {
+                container('maven') {
+                    sh 'mvn -version'
+                }
+                container('busybox') {
+                    sh '/bin/busybox'
                 }
             }
         }
-
     }
 }
