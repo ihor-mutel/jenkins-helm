@@ -4,7 +4,6 @@ String podDefinition = """
 apiVersion: v1
 kind: Pod
 metadata:
-  name: test
   labels:
     some-label: some-label-value
 spec:
