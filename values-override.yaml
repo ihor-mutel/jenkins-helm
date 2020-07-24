@@ -22,7 +22,7 @@ master:
 
   # kubectl create secret generic jenkins-credentials --from-file=credentials.xml -n jenkins
   # kubectl create secret generic jenkins-secrets --from-file=hudson.util.Secret --from-file=master.key -n jenkins
-  # kubectl create secret generic migor --from-file=config.json -n jenkins
+  # kubectl create secret generic docker-registry-kaniko --from-file=config.json -n jenkins
 
   secretsFilesSecret: jenkins-secrets
 
