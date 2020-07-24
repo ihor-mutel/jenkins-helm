@@ -16,6 +16,10 @@ podTemplate(containers: [
 
     node(POD_LABEL) {
 
+        triggers {
+            pollSCM 'H/15 * * * *'
+        }
+
         stage('Build docker') {
 
             checkout scm
