@@ -5,7 +5,7 @@
 export POD_NAME=$(kubectl get pods --namespace jenkins -l "app.kubernetes.io/component=jenkins-master" -l "app.kubernetes.io/instance=my-release" -o jsonpath="{.items[0].metadata.name}")
 ```
 
-### Copy secrets files
+### Copy jenkins secret files
 ```
 kubectl -n jenkins cp $POD_NAME:/var/jenkins_home/secrets/master.key master.key
 kubectl -n jenkins cp $POD_NAME:/var/jenkins_home/secrets/hudson.util.Secret hudson.util.Secret
