@@ -8,7 +8,9 @@ CMD ["/bin/sh"]
 
 // test pipeline trigger
 
-
+triggers {
+    cron('H 4/* 0 0 1-5')
+}
 
 podTemplate(containers: [
         containerTemplate(name: 'kaniko', image: 'registry.gitlab.com/griffinplus/gitlab-kaniko:latest', ttyEnabled: true, command: 'cat')
@@ -20,11 +22,10 @@ podTemplate(containers: [
 
     node(POD_LABEL) {
 
-        triggers {
-            cron('H 4/* 0 0 1-5')
-        }
-
         stage('Build docker') {
+            
+            checkout scm
+            
             container('kaniko') {
 
                 stage('Build docker') {
